@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2016
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Packaging", "Packaging", "{036180FE-D0CE-4016-B525-CEFE5690EFE4}"
+	ProjectSection(SolutionItems) = preProject
+		Packaging\build-appveyor.bat = Packaging\build-appveyor.bat
+		Packaging\build.bat = Packaging\build.bat
+		Packaging\build.xml = Packaging\build.xml
+		Packaging\package.nuspec = Packaging\package.nuspec
+		Packaging\Package.xml = Packaging\Package.xml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AreaProg.uDocumentEventHandler", "AreaProg.uDocumentEventHandler\AreaProg.uDocumentEventHandler.csproj", "{5EC0F075-9475-48A0-9802-81EF1C54A7AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5EC0F075-9475-48A0-9802-81EF1C54A7AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EC0F075-9475-48A0-9802-81EF1C54A7AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EC0F075-9475-48A0-9802-81EF1C54A7AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EC0F075-9475-48A0-9802-81EF1C54A7AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F685BE32-9B1F-4954-A761-E4B75EC1FA95}
+	EndGlobalSection
+EndGlobal
