@@ -18,7 +18,7 @@
   <PropertyGroup>
     <PackageName>AreaProg.uDocumentEventHandler</PackageName>
     <MinUmbracoVersion>7.0.0</MinUmbracoVersion>
-    <Readme><![CDATA[uDocumentEventHandler allows to hook up to content event handler by creating specific class.]]></Readme>
+    <Readme><![CDATA[uDocumentEventHandler allows to hook up to document event handlers by creating specific classes.]]></Readme>
     <AuthorName>Sébastien Sougnez</AuthorName>
     <AuthorUrl>https://www.areaprog.com/</AuthorUrl>
     <PackageLicenseName>MIT license</PackageLicenseName>
@@ -31,8 +31,8 @@
     <PackageId>AreaProg.uDocumentEventHandler</PackageId>
     <Copyright>Copyright &#169; Sébastien Sougnez</Copyright>
     <Owners>Sébastien Sougnez</Owners>
-    <Description>uDocumentEventHandler allows to hook up to content event handler by creating specific class.</Description>
-    <IconUrl>https://our.umbraco.com/media/wiki/146296/635658606992243477_link-checker-basePNG.PNG</IconUrl>
+    <Description>uDocumentEventHandler allows to hook up to document event handlers by creating specific classes.</Description>
+    <IconUrl>https://www.areaprog.com/resources/img/logo.png</IconUrl>
     <Tags>umbraco handler</Tags>
     <Language>en-GB</Language>
     <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
@@ -106,6 +106,7 @@
     <ItemGroup>
       <!-- Shared -->
       <BinFiles Include="$(CoreProjectDir)\bin\$(BuildConfig)\AreaProg.uDocumentEventHandler.dll" />
+      <PdbFiles Include="$(CoreProjectDir)\bin\$(BuildConfig)\AreaProg.uDocumentEventHandler.pdb" />
       
       <!-- Umbraco specific -->
       <PackageFile Include="$(MSBuildProjectDirectory)\package.xml" />
@@ -119,6 +120,7 @@
     
     <!--NuGet -->
     <Copy SourceFiles="@(BinFiles)" DestinationFolder="$(BuildNuGetDir)\lib\net45" />
+    <Copy SourceFiles="@(PdbFiles)" DestinationFolder="$(BuildNuGetDir)\lib\net45" />
     <Copy SourceFiles="@(NuSpecFile)" DestinationFolder="$(BuildNuGetDir)" />
 
   </Target>

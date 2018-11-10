@@ -6,25 +6,83 @@
     using System.Reflection;
     using Umbraco.Core;
     using Umbraco.Core.Models;
-    using Umbraco.Core.Models.PublishedContent;
     using Umbraco.Core.Services;
 
     /// <summary>
-    /// 
+    /// Used to bind document events to classes
     /// </summary>
-    public class DocumentEventHandlerBinder : ApplicationEventHandler
+    public static class DocumentEventHandlerBinder
     {
-        private readonly Dictionary<string, List<DocumentEventHandler>> handlers = new Dictionary<string, List<DocumentEventHandler>>();
+        private static readonly List<DocumentEventHandlerInfo> data = new List<DocumentEventHandlerInfo>();
+
+        /// <summary>
+        /// Bind the document event handlers
+        /// </summary>
+        /// <param name="assembly">Assembly that contains the document handlers</param>
+        public static void Bind(Assembly assembly)
+        {
+            Init(assembly);
+        }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="umbracoApplication"></param>
-        /// <param name="applicationContext"></param>
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        /// <param name="entities"></param>
+        /// <param name="action"></param>
+        private static void HandleEvents(IEnumerable<IContent> entities, Action<DocumentEventHandler> action)
         {
-            Init();
+            var alias = entities.FirstOrDefault()?.ContentType.Alias;
 
+            if (!string.IsNullOrEmpty(alias))
+            {
+                var handlers = data.Where(info => (info.Attribute.Include == null || info.Attribute.Include.Length == 0 || info.Attribute.Include.Contains(alias)) && (info.Attribute.Exclude == null || !info.Attribute.Exclude.Contains(alias)));
+
+                foreach (var handler in handlers)
+                {
+                    action(handler.Handler);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="action"></param>
+        private static void HandleEvents(IContent entity, Action<DocumentEventHandler> action)
+        {
+            HandleEvents(new List<IContent> { entity }, action);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void Init(Assembly assembly)
+        {
+            var handlerTypes = assembly.GetTypes().Where(t => t.BaseType == typeof(DocumentEventHandler));
+
+            foreach (var handlerType in handlerTypes)
+            {
+                var attribute = handlerType.GetCustomAttribute<DocumentEventHandlerAttribute>();
+
+                if (attribute != null)
+                {
+                    data.Add(new DocumentEventHandlerInfo
+                    {
+                        Handler = Activator.CreateInstance(handlerType) as DocumentEventHandler,
+                        Attribute = handlerType.GetCustomAttribute<DocumentEventHandlerAttribute>()
+                    });
+                }
+            }
+
+            BindEvents();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void BindEvents()
+        {
             ContentService.Copied += (cs, args) => HandleEvents(args.Original, h => h.Copied(cs, args));
             ContentService.Copying += (cs, args) => HandleEvents(args.Original, h => h.Copying(cs, args));
             ContentService.Created += (contentService, args) => HandleEvents(args.Entity, h => h.Created(contentService, args));
@@ -46,64 +104,6 @@
             ContentService.Publishing += (strategy, args) => HandleEvents(args.PublishedEntities, h => h.Publishing(strategy, args));
             ContentService.UnPublished += (strategy, args) => HandleEvents(args.PublishedEntities, h => h.Unpublished(strategy, args));
             ContentService.UnPublishing += (strategy, args) => HandleEvents(args.PublishedEntities, h => h.Unpublishing(strategy, args));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <param name="action"></param>
-        private void HandleEvents(IEnumerable<IContent> entities, Action<DocumentEventHandler> action)
-        {
-            var alias = entities.FirstOrDefault()?.ContentType.Alias;
-
-            if (!string.IsNullOrEmpty(alias) && handlers.ContainsKey(alias))
-            {
-                foreach (var handler in handlers[alias])
-                {
-                    action(handler);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="action"></param>
-        private void HandleEvents(IContent entity, Action<DocumentEventHandler> action)
-        {
-            HandleEvents(new List<IContent> { entity }, action);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void Init()
-        {
-            // TODO: Add key in the web config to define where to models are located and where the document event handler are located
-            var modelTypes = GetType().Assembly.GetTypes().Where(t => t.BaseType == typeof(PublishedContentModel));
-            var handlerTypes = GetType().Assembly.GetTypes().Where(t => t.BaseType == typeof(DocumentEventHandler));
-
-            // Looping through all the document type of the project
-            foreach (var modelType in modelTypes)
-            {
-                var modelAlias = modelType.GetCustomAttribute<PublishedContentModelAttribute>().ContentTypeAlias;
-                var modelHandlers = new List<DocumentEventHandler>();
-
-                // Looping through all the document event handler class of the project
-                foreach (var handlerType in handlerTypes)
-                {
-                    var handlerAliases = handlerType.GetCustomAttribute<DocumentEventHandlerAttribute>().Aliases;
-
-                    if (handlerAliases.Length == 0 || handlerAliases.Contains(modelAlias))
-                    {
-                        modelHandlers.Add(Activator.CreateInstance(handlerType) as DocumentEventHandler);
-                    }
-                }
-
-                handlers.Add(modelAlias, modelHandlers);
-            }
         }
     }
 }

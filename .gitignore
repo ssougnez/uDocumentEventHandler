@@ -332,3 +332,4 @@ ASALocalRun/
 # Package build
 **/Packaging/UmbracoBuild
 **/Packaging/NugetBuild
+**/Output
